@@ -1,0 +1,2 @@
+# Meta/Oculus Quest Android debugging. Restrict access to local interactive users.
+SUBSYSTEM=="usb", ATTR{idVendor}=="2833", MODE="0660", TAG+="uaccess"

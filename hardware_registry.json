@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "cameras": {
+    "left_arm_camera": {
+      "serial": "AY28162011Y",
+      "video_index": 0,
+      "width": 1280,
+      "height": 720,
+      "fps": 30,
+      "buffer_frames": 1,
+      "timestamp_mode": "v4l2_mono2abs"
+    },
+    "right_arm_camera": {
+      "serial": "AY2816200AA",
+      "video_index": 0,
+      "width": 1280,
+      "height": 720,
+      "fps": 30,
+      "buffer_frames": 1,
+      "timestamp_mode": "v4l2_mono2abs"
+    },
+    "third_person_camera": {
+      "serial": "SN0001",
+      "video_index": 0,
+      "width": 2048,
+      "height": 1536,
+      "fps": 30,
+      "buffer_frames": 1,
+      "timestamp_mode": "v4l2_mono2abs",
+      "capture_policy": "native_mjpeg_no_crop_no_scale_no_transcode"
+    }
+  },
+  "arms": {
+    "left_arm": {
+      "canable_serial": "2074339F5743",
+      "can_interface": "can0"
+    },
+    "right_arm": {
+      "canable_serial": "207A33695743",
+      "can_interface": "can1"
+    }
+  },
+  "excluded_camera_serials": [
+    "200901010001"
+  ]
+}

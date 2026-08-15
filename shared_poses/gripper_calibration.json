@@ -1,0 +1,12 @@
+{
+  "schema": "arx.gripper_calibration.v1",
+  "created_unix": 1786777129.5601587,
+  "can0": {
+    "role": "left",
+    "open_readout": -3.3216981887817383
+  },
+  "can1": {
+    "role": "right",
+    "open_readout": -3.464369773864746
+  }
+}

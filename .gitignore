@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.cache/
+.quest3-tools/
+camera_preview/
+logs/
+runs/
+sessions/
+sessions_vr/
+stability_run_*/
+release/
+wheelhouse/
+vendor/
+shared_poses/shutdown_pose_boot_id.txt
+

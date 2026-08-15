@@ -1,0 +1,27 @@
+{
+  "schema": "arx.quest3.teleop_config.v1",
+  "left": {
+    "enabled": true,
+    "gripper_enabled": true,
+    "translation_scale": 1.25,
+    "rotation_scale": 1.25,
+    "pid_kp": [0.45, 0.45, 0.45, 0.35, 0.35, 0.35],
+    "pid_ki": [0.02, 0.02, 0.02, 0.01, 0.01, 0.01],
+    "pid_kd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "max_translation_m": 0.30,
+    "quest_to_robot": [[1, 0, 0], [0, 0, -1], [0, 1, 0]],
+    "rotation_quest_to_eef": [[0, 0, -1], [-1, 0, 0], [0, 1, 0]]
+  },
+  "right": {
+    "enabled": true,
+    "gripper_enabled": true,
+    "translation_scale": 1.25,
+    "rotation_scale": 1.25,
+    "pid_kp": [0.45, 0.45, 0.45, 0.35, 0.35, 0.35],
+    "pid_ki": [0.02, 0.02, 0.02, 0.01, 0.01, 0.01],
+    "pid_kd": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "max_translation_m": 0.30,
+    "quest_to_robot": [[1, 0, 0], [0, 0, -1], [0, 1, 0]],
+    "rotation_quest_to_eef": [[0, 0, -1], [-1, 0, 0], [0, 1, 0]]
+  }
+}
