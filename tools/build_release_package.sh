@@ -57,7 +57,15 @@ fi
 ARCHIVE="$OUTPUT_DIR/$PACKAGE_NAME.tar.zst"
 tar --zstd -C "$STAGE_PARENT" -cf "$ARCHIVE" "$PACKAGE_NAME"
 sha256sum "$ARCHIVE" > "$ARCHIVE.sha256"
+rm -f -- "$ARCHIVE".part-* "$OUTPUT_DIR/$PACKAGE_NAME.parts.sha256"
+split -b 180M -d -a 2 "$ARCHIVE" "$ARCHIVE.part-"
+(
+  cd "$OUTPUT_DIR"
+  sha256sum "$PACKAGE_NAME.tar.zst".part-* > "$PACKAGE_NAME.parts.sha256"
+)
 
 echo "Release archive: $ARCHIVE"
 echo "Checksum: $ARCHIVE.sha256"
+echo "Upload parts: $ARCHIVE.part-*"
+echo "Part checksums: $OUTPUT_DIR/$PACKAGE_NAME.parts.sha256"
 du -h "$ARCHIVE"

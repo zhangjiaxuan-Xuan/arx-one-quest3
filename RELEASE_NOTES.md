@@ -2,6 +2,16 @@
 
 Release baseline: 2026-08-15, Linux x86_64, Python 3.10, ARX SDK 0.1.3.
 
+## v1.0.1
+
+- Synchronize every operator-registered collection preparation pose into the
+  live Quest controller, so left/right single-arm return uses the newly
+  registered pose instead of the target cached at process startup.
+- Update the shared preparation pose for the validated robot, with both
+  grippers registered fully open at `0.082 m`.
+- Keep whole-robot return, per-arm Quest return, recorder metadata, and the
+  persisted shared pose on one authoritative target during the same process.
+
 This package contains the verified dual-arm collection stack, Quest controller
 application and source, three-camera streaming, synchronized data collection,
 episode review, pi0.5 action adaptation, hardware serial registration, and the
@@ -50,4 +60,3 @@ pose, gripper calibration, Quest Unity source, and the prebuilt Quest APK.
 Excluded: collected episodes, logs, camera snapshots, model weights, Python and
 Conda caches, Unity `Library`, Android SDK downloads, and machine-specific boot
 IDs. The new computer captures its own shutdown pose on first startup.
-
