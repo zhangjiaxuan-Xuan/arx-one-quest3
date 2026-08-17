@@ -7,6 +7,15 @@ from quest3_input import QUEST_SLEEP_SAFE_EXIT_SECONDS
 
 
 class CollectionInputAuthorityTest(unittest.TestCase):
+    def test_pose_registration_updates_live_quest_return_target(self):
+        source = Path(collect_workflow.__file__).read_text(encoding="utf-8")
+        register = source.split("    def register_pose(self) -> None:", 1)[1].split(
+            "    def calibrate_quest_forward_motion", 1
+        )[0]
+        save = register.index("np.save(COLLECTION_INITIAL_POSE_PATH, self.initial_pose)")
+        update = register.index("self.quest_teleop.update_initial_pose(self.initial_pose)")
+        self.assertLess(save, update)
+
     def test_launcher_explicitly_preserves_terminal_input(self):
         launcher = (
             Path(__file__).parent / "tools" / "start_quest3_collection_test.sh"

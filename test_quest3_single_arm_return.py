@@ -1,5 +1,6 @@
 import unittest
 from types import SimpleNamespace
+import threading
 
 import numpy as np
 
@@ -13,6 +14,20 @@ from quest3_teleop import (
 
 
 class SingleArmReturnTest(unittest.TestCase):
+    def test_runtime_registration_replaces_both_return_targets(self):
+        controller = QuestTeleopController.__new__(QuestTeleopController)
+        controller._initial_lock = threading.Lock()
+        controller.initial_joint_targets = None
+        controller.initial_gripper_targets = None
+        pose = np.arange(14, dtype=np.float64) / 10.0
+
+        controller.update_initial_pose(pose)
+
+        np.testing.assert_allclose(controller.initial_joint_targets["right"], pose[:6])
+        np.testing.assert_allclose(controller.initial_joint_targets["left"], pose[7:13])
+        self.assertEqual(controller.initial_gripper_targets["right"], 0.082)
+        self.assertEqual(controller.initial_gripper_targets["left"], 0.082)
+
     def test_grip_engagement_never_infers_close_from_measured_width(self):
         self.assertEqual(trigger_gripper_command(0.0), 0)
         self.assertEqual(trigger_gripper_command(0.40), 0)

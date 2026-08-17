@@ -1590,6 +1590,8 @@ class Workflow:
         self.initial_pose[[6, 13]] = GRIPPER_WIDTH
         SHARED_POSES.mkdir(parents=True, exist_ok=True)
         np.save(COLLECTION_INITIAL_POSE_PATH, self.initial_pose)
+        if self.quest_teleop is not None:
+            self.quest_teleop.update_initial_pose(self.initial_pose)
         self.save_collection_progress()
         print(f"共享采集起始姿态已更新：{COLLECTION_INITIAL_POSE_PATH}")
 

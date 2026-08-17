@@ -355,6 +355,7 @@ class QuestTeleopController(threading.Thread):
         self.sessions = {"left": SideSession(), "right": SideSession()}
         self._status_lock = threading.Lock()
         self._forward_lock = threading.Lock()
+        self._initial_lock = threading.Lock()
         self._side_status = {"left": "待命", "right": "待命"}
         self._world_to_canonical = np.eye(3, dtype=np.float64)
         self._forward_motion_calibrated = False
@@ -362,9 +363,14 @@ class QuestTeleopController(threading.Thread):
         self.initial_joint_targets: dict[str, np.ndarray] | None = None
         self.initial_gripper_targets: dict[str, float] | None = None
         if initial_pose is not None:
-            pose = np.asarray(initial_pose, dtype=np.float64)
-            if pose.shape != (14,) or not np.isfinite(pose).all():
-                raise ValueError("Quest single-arm return requires a finite 14D initial pose")
+            self.update_initial_pose(initial_pose)
+
+    def update_initial_pose(self, initial_pose: np.ndarray) -> None:
+        """Atomically replace the return target after operator registration."""
+        pose = np.asarray(initial_pose, dtype=np.float64)
+        if pose.shape != (14,) or not np.isfinite(pose).all():
+            raise ValueError("Quest single-arm return requires a finite 14D initial pose")
+        with self._initial_lock:
             self.initial_joint_targets = {
                 "right": pose[0:6].copy(),
                 "left": pose[7:13].copy(),
@@ -534,7 +540,9 @@ class QuestTeleopController(threading.Thread):
 
     def _start_single_arm_return(self, side: str) -> None:
         """Latch current feedback, then start a non-blocking one-arm return."""
-        if self.initial_joint_targets is None:
+        with self._initial_lock:
+            has_initial_target = self.initial_joint_targets is not None
+        if not has_initial_target:
             self._set_status(side, "单臂回位不可用（未提供共享初始位）")
             return
         state = self._state(side)
@@ -557,32 +565,35 @@ class QuestTeleopController(threading.Thread):
 
     def _step_single_arm_return(self, side: str) -> None:
         session = self.sessions[side]
-        assert self.initial_joint_targets is not None
-        assert self.initial_gripper_targets is not None
         assert session.command is not None
+        with self._initial_lock:
+            assert self.initial_joint_targets is not None
+            assert self.initial_gripper_targets is not None
+            joint_target = self.initial_joint_targets[side].copy()
+            gripper_target = float(self.initial_gripper_targets[side])
         measured = self._state(side)
         next_position, complete = advance_single_arm_return(
             session.command.pos().copy(),
-            self.initial_joint_targets[side],
+            joint_target,
             measured[0],
         )
         session.command.pos()[:] = next_position
         session.command.gripper_pos += float(np.clip(
-            self.initial_gripper_targets[side] - session.command.gripper_pos,
+            gripper_target - session.command.gripper_pos,
             -MAX_GRIPPER_STEP_M,
             MAX_GRIPPER_STEP_M,
         ))
         complete = complete and bool(
             float(measured[3])
-            >= self.initial_gripper_targets[side]
+            >= gripper_target
             - SINGLE_ARM_RETURN_GRIPPER_TOLERANCE_M
         )
         self.arms.set_side_command(side, session.command)
         if complete:
             # Keep the exact standard pose commanded. The next Grip engagement
             # reanchors from feedback, so there is no delayed controller jump.
-            session.command.pos()[:] = self.initial_joint_targets[side]
-            session.command.gripper_pos = self.initial_gripper_targets[side]
+            session.command.pos()[:] = joint_target
+            session.command.gripper_pos = gripper_target
             self.arms.set_side_command(side, session.command)
             session.returning_to_initial = False
             session.at_initial_position = True
